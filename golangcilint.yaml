@@ -1,0 +1,77 @@
+run:
+  deadline: 60m
+  skip-dirs:
+    - "internal"
+
+linters:
+  enable-all: true
+  disable: funlen,gocognit,exhaustivestruct,paralleltest,forbidigo,ireturn,wrapcheck,exhaustive,maintidx,exhaustruct,nosnakecase,interfacer,structcheck,varcheck,deadcode,ifshort,golint,scopelint,maligned,rowserrcheck,sqlclosecheck
+
+linters-settings:
+  dupl:
+    threshold: 200
+  nestif:
+    min-complexity: 26
+  cyclop:
+    max-complexity: 40
+    skip-tests: true
+  varnamelen:
+    check-return: true
+    ignore-type-assert-ok: true
+    ignore-map-index-ok: true
+    ignore-chan-recv-ok: true
+    ignore-names:
+      - err
+      - ok
+      - gc
+      - wg
+    ignore-decls:
+      - n int
+      - i int
+      - r *os.File
+      - w *os.File
+      - to int64
+      - l *ldap.Conn
+  gci:
+    sections:
+      - standard
+      - default
+      - prefix(zotregistry.io/zot)
+  wsl:
+    allow-assign-and-anything: true
+    enforce-err-cuddling: true
+  nolintlint:
+    allow-unused: true
+  gomnd:
+    settings:
+      mnd:
+        checks: argument,case,condition,operation,return,assign
+        ignored-numbers: 10,64
+  gomoddirectives:
+    replace-allow-list:
+      - github.com/aquasecurity/fanal
+      - github.com/aquasecurity/trivy
+      - github.com/aquasecurity/trivy-db
+      - github.com/containers/image/v5
+      - github.com/opencontainers/image-spec
+      - github.com/open-policy-agent/opa
+      - github.com/vektah/gqlparser/v2
+      - go.opentelemetry.io/otel
+      - go.opentelemetry.io/otel/exporters/otlp
+      - go.opentelemetry.io/otel/metric
+      - go.opentelemetry.io/otel/sdk
+      - github.com/hashicorp/go-getter
+      - github.com/opencontainers/runc
+      - github.com/theupdateframework/go-tuf
+      - go.etcd.io/etcd/v3
+      - go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc
+      - go.opentelemetry.io/otel/exporters/otlp/otlptrace
+      - go.opentelemetry.io/otel/trace
+
+issues:
+  exclude-rules:
+    - path: pkg/extensions/search/schema.resolvers.go
+      linters:
+        - lll
+        - varnamelen
+        - gci
