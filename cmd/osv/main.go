@@ -18,6 +18,7 @@ func NewRootCmd() *cobra.Command {
 	pkgVersion := ""
 	ecosystem := ""
 	commit := ""
+	downloadDir := ""
 
 	rootCmd := &cobra.Command{
 		Use:   cmdName,
@@ -35,6 +36,12 @@ func NewRootCmd() *cobra.Command {
 			if pkg != "" && commit != "" {
 				_ = cmd.Usage()
 				os.Exit(1)
+			}
+
+			if downloadDir != "" {
+				if err := osv.Download(context.TODO(), downloadDir); err != nil {
+					os.Exit(1)
+				}
 			}
 
 			if pkg != "" {
@@ -57,6 +64,8 @@ func NewRootCmd() *cobra.Command {
 		"[Alpine,Android,crates.io,Debian,Go,GSD,Linux,Maven,npm,NuGet,OSS-Fuzz,Packagist,PyPI,RubyGems]")
 	// lookup commit hash
 	rootCmd.Flags().StringVarP(&commit, "commit", "c", "", "Lookup specified commit")
+	// download vulnerability db
+	rootCmd.Flags().StringVarP(&downloadDir, "dir", "d", "", "Download latest vulnerability data into specified dir")
 
 	// "version"
 	rootCmd.Flags().BoolVarP(&showVersion, "version", "v", false, "Show the version and exit")

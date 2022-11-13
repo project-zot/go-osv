@@ -7,6 +7,8 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"os"
+	"path"
 
 	"golang.org/x/vuln/osv"
 	"zotregistry.io/go-osv/errors"
@@ -118,4 +120,45 @@ func LookupCommitHash(ctx context.Context, commit string) ([]osv.Entry, error) {
 	// fmt.Printf("%v\n", resp)
 
 	return resp.Vulns, nil
+}
+
+func Download(ctx context.Context, dir string, ecosystems ...string) error {
+	if len(ecosystems) == 0 {
+		ecosystems = GetAllEcosystems()
+	}
+
+	err := os.MkdirAll(dir, os.ModePerm)
+	if err != nil {
+		return err
+	}
+
+	for _, ecosystem := range ecosystems {
+		out, err := os.Create(path.Join(dir, ecosystem) + ".zip")
+		if err != nil {
+			return err
+		}
+		defer out.Close()
+
+		url := fmt.Sprintf("https://osv-vulnerabilities.storage.googleapis.com/%s/all.zip", ecosystem)
+
+		req, err := http.NewRequestWithContext(ctx, http.MethodGet, url, nil)
+		if err != nil {
+			return err
+		}
+
+		client := http.Client{}
+
+		resp, err := client.Do(req)
+		if err != nil {
+			return err
+		}
+		defer resp.Body.Close()
+
+		_, err = io.Copy(out, resp.Body)
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
 }
